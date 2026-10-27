@@ -1,0 +1,193 @@
+MISURE DAX – Apple Ricavi Dashboard 🍏
+Tabelle: anni, prodotti, ricavi_prodotti, zone, ricavi_zone, prodotti_servizi (valori in miliardi di dollari)
+Filtri: prodotti[prodotto] (pagina 2) e zone[zona_breve] (pagina 4)
+Collegamenti: anni <- ricavi_prodotti / ricavi_zone / prodotti_servizi · prodotti <- ricavi_prodotti · zone <- ricavi_zone
+
+Ricavi Apple   (tabella anni) =
+    SUM ( anni[ricavi] )
+    formato: 0.0" mld $"
+
+Utile Netto Apple   (tabella anni) =
+    SUM ( anni[utile_netto] )
+    formato: 0.0" mld $"
+
+Ricavi 2025   (tabella anni) =
+    CALCULATE ( [Ricavi Apple], REMOVEFILTERS ( anni ), anni[anno] = 2025 )
+    formato: 0.0" mld $"
+
+Utile Netto 2025   (tabella anni) =
+    CALCULATE ( [Utile Netto Apple], REMOVEFILTERS ( anni ), anni[anno] = 2025 )
+    formato: 0.0" mld $"
+
+Volte dal 2010   (tabella anni) =
+    DIVIDE ( [Ricavi 2025], CALCULATE ( [Ricavi Apple], REMOVEFILTERS ( anni ), anni[anno] = 2010 ) )
+    formato: 0.0"x"
+
+Crescita Anno   (tabella anni) =
+    VAR a = MAX ( anni[anno] ) VAR prima = CALCULATE ( [Ricavi Apple], REMOVEFILTERS ( anni ), anni[anno] = a - 1 ) RETURN IF ( HASONEVALUE ( anni[anno] ) && NOT ISBLANK ( prima ), DIVIDE ( [Ricavi Apple] - prima, prima ) )
+    formato: +0.0%;-0.0%
+
+Colore Crescita   (tabella anni) =
+    IF ( [Crescita Anno] < 0, "#FF3B30", "#1D1D1F" )
+
+Costo su 100   (tabella anni) =
+    DIVIDE ( SUM ( anni[costo_vendite] ), SUM ( anni[ricavi] ) ) * 100
+    formato: 0.0" $"
+
+Ricerca su 100   (tabella anni) =
+    DIVIDE ( SUM ( anni[ricerca_sviluppo] ), SUM ( anni[ricavi] ) ) * 100
+    formato: 0.0" $"
+
+Spese su 100   (tabella anni) =
+    DIVIDE ( SUM ( anni[spese_vendita_generali] ), SUM ( anni[ricavi] ) ) * 100
+    formato: 0.0" $"
+
+Tasse su 100   (tabella anni) =
+    DIVIDE ( SUM ( anni[tasse] ), SUM ( anni[ricavi] ) ) * 100
+    formato: 0.0" $"
+
+Utile su 100   (tabella anni) =
+    DIVIDE ( SUM ( anni[utile_netto] ), SUM ( anni[ricavi] ) ) * 100
+    formato: 0.0" $"
+
+Margine Lordo su 100   (tabella anni) =
+    DIVIDE ( SUM ( anni[margine_lordo] ), SUM ( anni[ricavi] ) ) * 100
+    formato: 0.0" $"
+
+Utile su 100 2025   (tabella anni) =
+    CALCULATE ( [Utile su 100], REMOVEFILTERS ( anni ), anni[anno] = 2025 )
+    formato: 0.0" $"
+
+Margine Lordo su 100 2025   (tabella anni) =
+    CALCULATE ( [Margine Lordo su 100], REMOVEFILTERS ( anni ), anni[anno] = 2025 )
+    formato: 0.0" $"
+
+Ricerca 2025   (tabella anni) =
+    CALCULATE ( SUM ( anni[ricerca_sviluppo] ), REMOVEFILTERS ( anni ), anni[anno] = 2025 )
+    formato: 0.0" mld $"
+
+Ricerca Volte dal 2010   (tabella anni) =
+    DIVIDE ( [Ricerca 2025], CALCULATE ( SUM ( anni[ricerca_sviluppo] ), REMOVEFILTERS ( anni ), anni[anno] = 2010 ) )
+    formato: 0"x"
+
+Ricavi Prodotto   (tabella ricavi_prodotti) =
+    SUM ( ricavi_prodotti[ricavi] )
+    formato: 0.0" mld $"
+
+Quota Prodotto   (tabella ricavi_prodotti) =
+    DIVIDE ( [Ricavi Prodotto], CALCULATE ( [Ricavi Prodotto], REMOVEFILTERS ( prodotti ) ) )
+    formato: 0.0%
+
+Ricavi Prodotto 2025   (tabella ricavi_prodotti) =
+    CALCULATE ( [Ricavi Prodotto], REMOVEFILTERS ( anni ), anni[anno] = 2025 )
+    formato: 0.0" mld $"
+
+Quota 2013   (tabella ricavi_prodotti) =
+    CALCULATE ( [Quota Prodotto], REMOVEFILTERS ( anni ), anni[anno] = 2013 )
+    formato: 0.0%
+
+Quota 2025   (tabella ricavi_prodotti) =
+    CALCULATE ( [Quota Prodotto], REMOVEFILTERS ( anni ), anni[anno] = 2025 )
+    formato: 0.0%
+
+Volte dal 2013   (tabella ricavi_prodotti) =
+    DIVIDE ( [Ricavi Prodotto 2025], CALCULATE ( [Ricavi Prodotto], REMOVEFILTERS ( anni ), anni[anno] = 2013 ) )
+    formato: 0.0"x"
+
+Anno Record   (tabella ricavi_prodotti) =
+    MAXX ( TOPN ( 1, VALUES ( ricavi_prodotti[anno] ), [Ricavi Prodotto], DESC ), ricavi_prodotti[anno] )
+    formato: 0
+
+Quota iPhone 2025   (tabella ricavi_prodotti) =
+    CALCULATE ( [Quota Prodotto], REMOVEFILTERS ( anni ), anni[anno] = 2025, REMOVEFILTERS ( prodotti ), prodotti[prodotto] = "iPhone" )
+    formato: 0.0%
+
+Quota Servizi 2025   (tabella ricavi_prodotti) =
+    CALCULATE ( [Quota Prodotto], REMOVEFILTERS ( anni ), anni[anno] = 2025, REMOVEFILTERS ( prodotti ), prodotti[prodotto] = "Servizi" )
+    formato: 0.0%
+
+Ricavi iPhone   (tabella ricavi_prodotti) =
+    CALCULATE ( [Ricavi Prodotto], REMOVEFILTERS ( prodotti ), prodotti[prodotto] = "iPhone" )
+    formato: 0.0" mld $"
+
+Ricavi Servizi   (tabella ricavi_prodotti) =
+    CALCULATE ( [Ricavi Prodotto], REMOVEFILTERS ( prodotti ), prodotti[prodotto] = "Servizi" )
+    formato: 0.0" mld $"
+
+Ricavi Servizi 2025   (tabella ricavi_prodotti) =
+    CALCULATE ( [Ricavi Servizi], REMOVEFILTERS ( anni ), anni[anno] = 2025 )
+    formato: 0.0" mld $"
+
+Servizi Volte dal 2013   (tabella ricavi_prodotti) =
+    DIVIDE ( [Ricavi Servizi 2025], CALCULATE ( [Ricavi Servizi], REMOVEFILTERS ( anni ), anni[anno] = 2013 ) )
+    formato: 0.0"x"
+
+Colore Prodotto   (tabella prodotti) =
+    SELECTEDVALUE ( prodotti[colore_prodotto], "#1D1D1F" )
+
+Ricavi Zona   (tabella ricavi_zone) =
+    SUM ( ricavi_zone[ricavi] )
+    formato: 0.0" mld $"
+
+Quota Zona   (tabella ricavi_zone) =
+    DIVIDE ( [Ricavi Zona], CALCULATE ( [Ricavi Zona], REMOVEFILTERS ( zone ) ) )
+    formato: 0.0%
+
+Ricavi Zona 2025   (tabella ricavi_zone) =
+    CALCULATE ( [Ricavi Zona], REMOVEFILTERS ( anni ), anni[anno] = 2025 )
+    formato: 0.0" mld $"
+
+Quota Zona 2013   (tabella ricavi_zone) =
+    CALCULATE ( [Quota Zona], REMOVEFILTERS ( anni ), anni[anno] = 2013 )
+    formato: 0.0%
+
+Quota Zona 2025   (tabella ricavi_zone) =
+    CALCULATE ( [Quota Zona], REMOVEFILTERS ( anni ), anni[anno] = 2025 )
+    formato: 0.0%
+
+Crescita dal 2013   (tabella ricavi_zone) =
+    VAR prima = CALCULATE ( [Ricavi Zona], REMOVEFILTERS ( anni ), anni[anno] = 2013 ) RETURN DIVIDE ( [Ricavi Zona 2025] - prima, prima )
+    formato: +0%;-0%
+
+Utile Zona su 100 2025   (tabella ricavi_zone) =
+    CALCULATE ( DIVIDE ( SUM ( ricavi_zone[utile_operativo] ), SUM ( ricavi_zone[ricavi] ) ) * 100, REMOVEFILTERS ( anni ), anni[anno] = 2025 )
+    formato: 0" $"
+
+Quota Cina 2025   (tabella ricavi_zone) =
+    CALCULATE ( [Quota Zona], REMOVEFILTERS ( anni ), anni[anno] = 2025, REMOVEFILTERS ( zone ), zone[zona] = "Grande Cina" )
+    formato: 0.0%
+
+Quota Cina 2015   (tabella ricavi_zone) =
+    CALCULATE ( [Quota Zona], REMOVEFILTERS ( anni ), anni[anno] = 2015, REMOVEFILTERS ( zone ), zone[zona] = "Grande Cina" )
+    formato: 0.0%
+
+Colore Zona   (tabella zone) =
+    SELECTEDVALUE ( zone[colore_zona], "#1D1D1F" )
+
+Margine su 100   (tabella prodotti_servizi) =
+    DIVIDE ( SUM ( prodotti_servizi[margine_lordo] ), SUM ( prodotti_servizi[ricavi] ) ) * 100
+    formato: 0.0" $"
+
+Servizi sui Ricavi   (tabella prodotti_servizi) =
+    DIVIDE ( CALCULATE ( SUM ( prodotti_servizi[ricavi] ), prodotti_servizi[tipo] = "Servizi" ), CALCULATE ( SUM ( prodotti_servizi[ricavi] ), REMOVEFILTERS ( prodotti_servizi[tipo] ) ) )
+    formato: 0.0%
+
+Servizi sul Margine   (tabella prodotti_servizi) =
+    DIVIDE ( CALCULATE ( SUM ( prodotti_servizi[margine_lordo] ), prodotti_servizi[tipo] = "Servizi" ), CALCULATE ( SUM ( prodotti_servizi[margine_lordo] ), REMOVEFILTERS ( prodotti_servizi[tipo] ) ) )
+    formato: 0.0%
+
+Margine Servizi 2025   (tabella prodotti_servizi) =
+    CALCULATE ( [Margine su 100], REMOVEFILTERS ( anni ), anni[anno] = 2025, prodotti_servizi[tipo] = "Servizi" )
+    formato: 0.0" $"
+
+Margine Prodotti 2025   (tabella prodotti_servizi) =
+    CALCULATE ( [Margine su 100], REMOVEFILTERS ( anni ), anni[anno] = 2025, prodotti_servizi[tipo] = "Prodotti" )
+    formato: 0.0" $"
+
+Servizi sul Margine 2025   (tabella prodotti_servizi) =
+    CALCULATE ( [Servizi sul Margine], REMOVEFILTERS ( anni ), anni[anno] = 2025 )
+    formato: 0.0%
+
+📌 REMOVEFILTERS ( anni ), anni[anno] = 2025 → il valore del 2025, qualunque anno sia scelto.
+📌 Le misure "Colore ..." danno il colore ai grafici.
+📌 I nomi delle misure sono diversi dai nomi delle colonne.
